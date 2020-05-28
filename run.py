@@ -265,6 +265,7 @@ def create_report(stats):
     if not os.path.exists(REPORT_DIR):
         os.makedirs(REPORT_DIR)
 
+    # Always update all project report
     with open(os.path.join(REPORT_DIR, 'report.csv'), 'w') as f:
         f.write('Effective Rate Per Word,{}\n'.format(
             stats['Effective Rate Per Word']))
@@ -352,8 +353,7 @@ def create_monthly_report(stats):
             os.makedirs(year_month_dir)
 
         if len(os.listdir(year_month_dir)) != 0:
-            print('existing report ! update report?')
-            exit(0)
+            continue  # Skip the month if there is an existing report.
         else:
             with open(os.path.join(year_month_dir, f'report{year_month}.csv'), 'w') as f:
                 f.write('{} Monthly Report,\n'.format(year_month))
