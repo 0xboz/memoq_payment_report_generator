@@ -8,7 +8,11 @@ DISCOUNT_85_94 = 0.5
 
 DATA_DIR = './data'
 REPORT_DIR = './report'
-PROJECTS = {}  # 'code': [{project 1 dict}, {project 2 dict}]
+PROJECTS = {
+    'Total Fee': 0,
+    'Total': 0,
+    'Effective Rate Per Word': 0,
+}
 
 
 def get_stats():
@@ -18,6 +22,9 @@ def get_stats():
     Calculate the fees
     return: Python Dictionary
         {
+            'Total Fee': ,
+            'Total': ,
+            'Effective Rate Per Word': ,
             'E00XX1 Effective Rate Per Word': ,
             'E00XX1 Total Fee': , 
             'E00XX1': [
@@ -74,7 +81,7 @@ def get_stats():
                     # Get project code and name
                     path = info[0].replace('"', '')
                     # https://stackoverflow.com/a/8384788/11461544
-                    name = ntpath.basename(path)
+                    name = ntpath.basename(path).replace(',', '')
 
                     stats = {
                         'X-translated': int(info[3]),
@@ -124,15 +131,21 @@ def get_stats():
                     PROJECTS[code] = list(
                         {v['name']: v for v in PROJECTS[code]}.values())
 
-    # Calculate total fee and effective rate per word based on code
+    # Calculate total fee and effective rate per word
     for key in PROJECTS.keys():
         if isinstance(PROJECTS[key], list):
             for project in PROJECTS[key]:
                 PROJECTS[f'{key} Total Fee'] += project['stats']['Total Fee']
                 PROJECTS[f'{key} Total'] += project['stats']['Total']
 
+                PROJECTS['Total Fee'] += project['stats']['Total Fee']
+                PROJECTS['Total'] += project['stats']['Total']
+
             PROJECTS[f'{key} Effective Rate Per Word'] = PROJECTS[f'{key} Total Fee'] / \
                 PROJECTS[f'{key} Total']
+
+    PROJECTS['Effective Rate Per Word'] = PROJECTS['Total Fee'] / \
+        PROJECTS['Total']
 
 
 def create_report():
@@ -140,6 +153,11 @@ def create_report():
         os.makedirs(REPORT_DIR)
 
     with open(os.path.join(REPORT_DIR, 'report.csv'), 'w') as f:
+        f.write('Effective Rate Per Word,{}\n'.format(
+            PROJECTS['Effective Rate Per Word']))
+        f.write('Total Fee,{}\n'.format(PROJECTS['Total Fee']))
+        f.write('Total,{}\n\n\n'.format(PROJECTS['Total']))
+
         for key in PROJECTS.keys():
             if isinstance(PROJECTS[key], list):
                 f.write('{} Effective Rate Per Word,{}\n'.format(
@@ -153,7 +171,7 @@ def create_report():
                     f.write(project['name'] + ',' + ','.join([str(e)
                                                               for e in project['stats'].values()]) + '\n')
 
-                f.write('\n')
+                f.write('\n\n')
 
 
 if __name__ == "__main__":
