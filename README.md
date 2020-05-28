@@ -1,6 +1,6 @@
 # memoQ Payment Report Generator
 
-Python automation script creating monthly/overall payment reports of memoQ
+Python automation script creating monthly/overall memoQ payment reports
 
 ## How-to
 
