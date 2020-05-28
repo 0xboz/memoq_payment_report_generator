@@ -143,7 +143,7 @@ def get_stats():
 
     except FileNotFoundError as e:
         logging.critical('ERROR: You need to download csv files first and save them to `data/` direcotry.')
-
+        exit(1)
 
     # Calculate extra metrics in all_stats
     # Such as `Total Fee`, `Total`, `Effective Rate Per Word` for each project code (E00XXX) and all projects
