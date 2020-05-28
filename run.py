@@ -197,6 +197,18 @@ def get_stats():
     return all_stats, monthly_stats
 
 
+def convert(monthly_stats):
+    """
+    Convert monthly stats to all stats
+    """
+    all_stats = {}
+
+    for stats in monthly_stats.values():        
+        all_stats.update(stats)
+
+    return all_stats
+
+
 def create_report(stats):
     """
     Generate a report for all compoleted projects.
