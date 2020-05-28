@@ -12,6 +12,13 @@ DISCOUNT_85_94 = 0.5
 DATA_DIR = './data'
 REPORT_DIR = './report'
 
+logger = logging.getLogger()
+handler = logging.StreamHandler()
+formatter = logging.Formatter('%(asctime)s %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.setLevel(logging.ERROR)
+
 
 def creation_date(path_to_file):  # https://stackoverflow.com/a/39501288/11461544
     """
@@ -142,7 +149,8 @@ def get_stats():
                             {v['name']: v for v in all_stats[code]}.values())
 
     except FileNotFoundError as e:
-        logging.critical('ERROR: You need to download csv files first and save them to `data/` direcotry.')
+        logger.critical(
+            'Download csv files first and save them to `data/` directory.')
         exit(1)
 
     # Calculate extra metrics in all_stats
@@ -162,28 +170,27 @@ def get_stats():
     all_stats['Effective Rate Per Word'] = all_stats['Total Fee'] / \
         all_stats['Total']
 
-
     # Calculate extra metrics in monthly_stats
     # Such as monthly-based `Total Fee`, `Total`, `Effective Rate Per Word` for each project code (E00XXX) and all projects
     for month in monthly_stats.keys():
         monthly_stats[month]['Total Fee'] = 0
         monthly_stats[month]['Total'] = 0
-        monthly_stats[month]['Effective Rate Per Word'] = 0 
+        monthly_stats[month]['Effective Rate Per Word'] = 0
 
-        for code in monthly_stats[month]:                   
-            if isinstance(monthly_stats[month][code], list):             
-                for project in monthly_stats[month][code]:   
-                              
+        for code in monthly_stats[month]:
+            if isinstance(monthly_stats[month][code], list):
+                for project in monthly_stats[month][code]:
+
                     monthly_stats[month][f'{code} Total Fee'] += project['stats']['Total Fee']
                     monthly_stats[month][f'{code} Total'] += project['stats']['Total']
-                    monthly_stats[month][f'{code} Effective Rate Per Word'] = monthly_stats[month][f'{code} Total Fee'] / monthly_stats[month][f'{code} Total']
+                    monthly_stats[month][f'{code} Effective Rate Per Word'] = monthly_stats[
+                        month][f'{code} Total Fee'] / monthly_stats[month][f'{code} Total']
 
                     monthly_stats[month]['Total Fee'] += project['stats']['Total Fee']
-                    monthly_stats[month]['Total'] += project['stats']['Total']                    
+                    monthly_stats[month]['Total'] += project['stats']['Total']
 
         monthly_stats[month]['Effective Rate Per Word'] = monthly_stats[month]['Total Fee'] / \
             monthly_stats[month]['Total']
-
 
     return all_stats, monthly_stats
 
@@ -338,7 +345,8 @@ def create_monthly_report(stats):
                 f.write('{} Monthly Report,\n'.format(year_month))
                 f.write('Effective Rate Per Word,{}\n'.format(
                     stats[year_month]['Effective Rate Per Word']))
-                f.write('Total Fee,{}\n'.format(stats[year_month]['Total Fee']))
+                f.write('Total Fee,{}\n'.format(
+                    stats[year_month]['Total Fee']))
                 f.write('Total,{}\n\n\n'.format(stats[year_month]['Total']))
 
                 for key in stats[year_month].keys():
@@ -347,18 +355,19 @@ def create_monthly_report(stats):
                             key, stats[year_month][f'{key} Effective Rate Per Word']))
                         f.write('{} Total Fee,{}\n'.format(
                             key, stats[year_month][f'{key} Total Fee']))
-                        f.write('{} Total,{}\n'.format(key, stats[year_month][f'{key} Total']))
+                        f.write('{} Total,{}\n'.format(
+                            key, stats[year_month][f'{key} Total']))
                         f.write('{} Details,'.format(key) + 'X-translated,X-translated Fee,101%,101% Fee,Repetitions,Repetitions Fee,100%,100% Fee,95% ~ 99%,95% ~ 99% Fee,85% ~ 94%,85% ~ 94% Fee,75% ~ 84%,75% ~ 84% Fee,50% ~ 74%,50% ~ 74% Fee,No Match,No Match Fee,Fragments,Total,Total Fee,Effective Rate Per Word\n')
 
                         for project in stats[year_month][key]:
                             f.write(project['name'] + ',' + ','.join([str(e)
-                                                                    for e in project['stats'].values()]) + '\n')
+                                                                      for e in project['stats'].values()]) + '\n')
 
                         f.write('\n\n')
-             
+
 
 if __name__ == "__main__":
-    
-    all_projects_stats, projects_stats_by_month = get_stats() 
+
+    all_projects_stats, projects_stats_by_month = get_stats()
     create_report(all_projects_stats)
     create_monthly_report(projects_stats_by_month)
