@@ -8,6 +8,8 @@ RAT_PER_WORD = 0.08
 DISCOUNT_100 = 0.9
 DISCOUNT_95_99 = 0.7
 DISCOUNT_85_94 = 0.5
+DISCOUNT_75_84 = 0
+DISCOUNT_50_74 = 0
 
 DATA_DIR = './data'
 REPORT_DIR = './report'
@@ -89,15 +91,15 @@ def get_stats():
                             '85% ~ 94%': int(info[43]),
                             '85% ~ 94% Fee': int(info[43]) * RAT_PER_WORD * (1 - DISCOUNT_85_94),
                             '75% ~ 84%': int(info[51]),
-                            '75% ~ 84% Fee': int(info[51]) * RAT_PER_WORD,
+                            '75% ~ 84% Fee': int(info[51]) * RAT_PER_WORD * (1 - DISCOUNT_75_84),
                             '50% ~ 74%': int(info[59]),
-                            '50% ~ 74% Fee': int(info[59]) * RAT_PER_WORD,
+                            '50% ~ 74% Fee': int(info[59]) * RAT_PER_WORD * (1 - DISCOUNT_50_74),
                             'No Match': int(info[67]),
                             'No Match Fee': int(info[67]) * RAT_PER_WORD,
                             'Fragments': int(info[75]),
                             'Total': int(info[83]),
-                            'Total Fee': RAT_PER_WORD * ((int(info[3]) + int(info[11]) + int(info[19]) + int(info[27])) * (1 - DISCOUNT_100) + int(info[35]) * (1 - DISCOUNT_95_99) + int(info[43]) * (1 - DISCOUNT_85_94) + int(info[51]) + int(info[59]) + int(info[67])),
-                            'Effective Rate Per Word': RAT_PER_WORD * ((int(info[3]) + int(info[11]) + int(info[19]) + int(info[27])) * (1 - DISCOUNT_100) + int(info[35]) * (1 - DISCOUNT_95_99) + int(info[43]) * (1 - DISCOUNT_85_94) + int(info[51]) + int(info[59]) + int(info[67])) / int(info[83]),
+                            'Total Fee': RAT_PER_WORD * ((int(info[3]) + int(info[11]) + int(info[19]) + int(info[27])) * (1 - DISCOUNT_100) + int(info[35]) * (1 - DISCOUNT_95_99) + int(info[43]) * (1 - DISCOUNT_85_94) + int(info[51]) * (1 - DISCOUNT_75_84) + int(info[59]) * (1 - DISCOUNT_50_74) + int(info[67])),
+                            'Effective Rate Per Word': RAT_PER_WORD * ((int(info[3]) + int(info[11]) + int(info[19]) + int(info[27])) * (1 - DISCOUNT_100) + int(info[35]) * (1 - DISCOUNT_95_99) + int(info[43]) * (1 - DISCOUNT_85_94) + int(info[51]) * (1 - DISCOUNT_75_84) + int(info[59]) * (1 - DISCOUNT_50_74) + int(info[67])) / int(info[83]),
                         }
 
                         project = {
