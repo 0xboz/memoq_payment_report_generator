@@ -7,10 +7,11 @@ DISCOUNT_95_99 = 0.7
 DISCOUNT_85_94 = 0.5
 
 DATA_DIR = './data'
+REPORT_DIR = './report'
 PROJECTS = {}  # 'code': [{project 1 dict}, {project 2 dict}]
 
 
-def get_stats(data=DATA_DIR):
+def get_stats():
     """
     Fetch project code, name and stats from a directory.
     Remove all duplicates.
@@ -126,7 +127,6 @@ def get_stats(data=DATA_DIR):
     # Calculate total fee and effective rate per word based on code
     for key in PROJECTS.keys():
         if isinstance(PROJECTS[key], list):
-
             for project in PROJECTS[key]:
                 PROJECTS[f'{key} Total Fee'] += project['stats']['Total Fee']
                 PROJECTS[f'{key} Total'] += project['stats']['Total']
@@ -135,6 +135,23 @@ def get_stats(data=DATA_DIR):
                 PROJECTS[f'{key} Total']
 
 
+def create_report():
+    if not os.path.exists(REPORT_DIR):
+        os.makedirs(REPORT_DIR)
+
+    with open(os.path.join(REPORT_DIR, 'report.csv'), 'w') as f:
+
+        for key in PROJECTS.keys():
+            if isinstance(PROJECTS[key], list):
+                f.write('{} Effective Rate Per Word,{}\n'.format(key, PROJECTS[f'{key} Effective Rate Per Word']))
+                f.write('{} Total Fee,{}\n'.format(key, PROJECTS[f'{key} Total Fee']))
+                f.write('{} Total,{}\n'.format(key, PROJECTS[f'{key} Total']))
+                f.write('{} Details,'.format(key) + 'X-translated,X-translated Fee,101%,101% Fee,Repetitions,Repetitions Fee,100%,100% Fee,95% ~ 99%,95% ~ 99% Fee,85% ~ 94%,85% ~ 94% Fee,75% ~ 84%,75% ~ 84% Fee,50% ~ 74%,50% ~ 74% Fee,No Match,No Match Fee,Fragments,Total,Total Fee,Effective Rate Per Word\n')
+
+                for project in PROJECTS[key]:                    
+                    f.write(project['name'] + ',' + ','.join([str(e) for e in project['stats'].values()]) + '\n')
+
+
 if __name__ == "__main__":
     get_stats()
-    print(PROJECTS)
+    create_report()
