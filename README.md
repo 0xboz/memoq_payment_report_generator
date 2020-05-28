@@ -1,6 +1,6 @@
 # Terra Translation Report Generator
 
-Python automation script creating monthly/overall payment reports of Terra Translation.
+Python automation script creating monthly/overall payment reports of Terra Translation
 
 ## How-to
 
