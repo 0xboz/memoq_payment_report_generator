@@ -9,7 +9,6 @@ In the terminal, run:
 ```shell
 git clone https://github.com/0xboz/memoq_payment_report_generator.git
 cd memoq_payment_report_generator
-chmod +x run.py
 ```
 
 Download the csv files from memoQ web interface, and save them to a directory named `data/` under `memoq_payment_report_generator/`.
