@@ -148,7 +148,7 @@ def get_stats():
                         # Remove duplicates in monthly_stats
                         # https://stackoverflow.com/a/11092590/11461544
                         monthly_stats[year_month][code] = list(
-                            {v['name']: v for v in all_stats[code]}.values())
+                            {v['name']: v for v in monthly_stats[year_month][code]}.values())
 
     except FileNotFoundError as e:
         logger.critical(
