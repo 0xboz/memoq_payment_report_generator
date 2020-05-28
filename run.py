@@ -140,16 +140,20 @@ def create_report():
         os.makedirs(REPORT_DIR)
 
     with open(os.path.join(REPORT_DIR, 'report.csv'), 'w') as f:
-
         for key in PROJECTS.keys():
             if isinstance(PROJECTS[key], list):
-                f.write('{} Effective Rate Per Word,{}\n'.format(key, PROJECTS[f'{key} Effective Rate Per Word']))
-                f.write('{} Total Fee,{}\n'.format(key, PROJECTS[f'{key} Total Fee']))
+                f.write('{} Effective Rate Per Word,{}\n'.format(
+                    key, PROJECTS[f'{key} Effective Rate Per Word']))
+                f.write('{} Total Fee,{}\n'.format(
+                    key, PROJECTS[f'{key} Total Fee']))
                 f.write('{} Total,{}\n'.format(key, PROJECTS[f'{key} Total']))
                 f.write('{} Details,'.format(key) + 'X-translated,X-translated Fee,101%,101% Fee,Repetitions,Repetitions Fee,100%,100% Fee,95% ~ 99%,95% ~ 99% Fee,85% ~ 94%,85% ~ 94% Fee,75% ~ 84%,75% ~ 84% Fee,50% ~ 74%,50% ~ 74% Fee,No Match,No Match Fee,Fragments,Total,Total Fee,Effective Rate Per Word\n')
 
-                for project in PROJECTS[key]:                    
-                    f.write(project['name'] + ',' + ','.join([str(e) for e in project['stats'].values()]) + '\n')
+                for project in PROJECTS[key]:
+                    f.write(project['name'] + ',' + ','.join([str(e)
+                                                              for e in project['stats'].values()]) + '\n')
+
+                f.write('\n')
 
 
 if __name__ == "__main__":
