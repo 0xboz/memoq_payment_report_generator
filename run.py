@@ -1,4 +1,5 @@
 from datetime import datetime as dt
+import logging
 import ntpath
 import os
 import platform
@@ -49,94 +50,100 @@ def get_stats():
     monthly_stats = {}
 
     # https://stackoverflow.com/a/3964691/11461544
-    for file in os.listdir(DATA_DIR):
-        with open(os.path.join(DATA_DIR, file), 'r') as f:
-            epoch = creation_date(os.path.join(DATA_DIR, file))
-            date = dt.fromtimestamp(epoch)
 
-            for index, line in enumerate(f.readlines()):
+    try:
+        for file in os.listdir(DATA_DIR):
+            with open(os.path.join(DATA_DIR, file), 'r') as f:
+                epoch = creation_date(os.path.join(DATA_DIR, file))
+                date = dt.fromtimestamp(epoch)
 
-                if index == 2:
+                for index, line in enumerate(f.readlines()):
 
-                    info = line.split(';')
+                    if index == 2:
 
-                    # Get project code and name
-                    path = info[0].replace('"', '')
-                    # https://stackoverflow.com/a/8384788/11461544
-                    name = ntpath.basename(path).replace(',', '')
+                        info = line.split(';')
 
-                    stats = {
-                        'X-translated': int(info[3]),
-                        'X-translated Fee': int(info[3]) * RAT_PER_WORD * (1 - DISCOUNT_100),
-                        '101%': int(info[11]),
-                        '101% Fee': int(info[11]) * RAT_PER_WORD * (1 - DISCOUNT_100),
-                        'Repetitions': int(info[19]),
-                        'Repetitions Fee': int(info[19]) * RAT_PER_WORD * (1 - DISCOUNT_100),
-                        '100%': int(info[27]),
-                        '100% Fee': int(info[27]) * RAT_PER_WORD * (1 - DISCOUNT_100),
-                        '95% ~ 99%': int(info[35]),
-                        '95% ~ 99% Fee': int(info[35]) * RAT_PER_WORD * (1 - DISCOUNT_95_99),
-                        '85% ~ 94%': int(info[43]),
-                        '85% ~ 94% Fee': int(info[43]) * RAT_PER_WORD * (1 - DISCOUNT_85_94),
-                        '75% ~ 84%': int(info[51]),
-                        '75% ~ 84% Fee': int(info[51]) * RAT_PER_WORD,
-                        '50% ~ 74%': int(info[59]),
-                        '50% ~ 74% Fee': int(info[59]) * RAT_PER_WORD,
-                        'No Match': int(info[67]),
-                        'No Match Fee': int(info[67]) * RAT_PER_WORD,
-                        'Fragments': int(info[75]),
-                        'Total': int(info[83]),
-                        'Total Fee': RAT_PER_WORD * ((int(info[3]) + int(info[11]) + int(info[19]) + int(info[27])) * (1 - DISCOUNT_100) + int(info[35]) * (1 - DISCOUNT_95_99) + int(info[43]) * (1 - DISCOUNT_85_94) + int(info[51]) + int(info[59]) + int(info[67])),
-                        'Effective Rate Per Word': RAT_PER_WORD * ((int(info[3]) + int(info[11]) + int(info[19]) + int(info[27])) * (1 - DISCOUNT_100) + int(info[35]) * (1 - DISCOUNT_95_99) + int(info[43]) * (1 - DISCOUNT_85_94) + int(info[51]) + int(info[59]) + int(info[67])) / int(info[83]),
-                    }
+                        # Get project code and name
+                        path = info[0].replace('"', '')
+                        # https://stackoverflow.com/a/8384788/11461544
+                        name = ntpath.basename(path).replace(',', '')
 
-                    project = {
-                        'name': name,
-                        'stats': stats,
-                        'date': date,
-                    }
+                        stats = {
+                            'X-translated': int(info[3]),
+                            'X-translated Fee': int(info[3]) * RAT_PER_WORD * (1 - DISCOUNT_100),
+                            '101%': int(info[11]),
+                            '101% Fee': int(info[11]) * RAT_PER_WORD * (1 - DISCOUNT_100),
+                            'Repetitions': int(info[19]),
+                            'Repetitions Fee': int(info[19]) * RAT_PER_WORD * (1 - DISCOUNT_100),
+                            '100%': int(info[27]),
+                            '100% Fee': int(info[27]) * RAT_PER_WORD * (1 - DISCOUNT_100),
+                            '95% ~ 99%': int(info[35]),
+                            '95% ~ 99% Fee': int(info[35]) * RAT_PER_WORD * (1 - DISCOUNT_95_99),
+                            '85% ~ 94%': int(info[43]),
+                            '85% ~ 94% Fee': int(info[43]) * RAT_PER_WORD * (1 - DISCOUNT_85_94),
+                            '75% ~ 84%': int(info[51]),
+                            '75% ~ 84% Fee': int(info[51]) * RAT_PER_WORD,
+                            '50% ~ 74%': int(info[59]),
+                            '50% ~ 74% Fee': int(info[59]) * RAT_PER_WORD,
+                            'No Match': int(info[67]),
+                            'No Match Fee': int(info[67]) * RAT_PER_WORD,
+                            'Fragments': int(info[75]),
+                            'Total': int(info[83]),
+                            'Total Fee': RAT_PER_WORD * ((int(info[3]) + int(info[11]) + int(info[19]) + int(info[27])) * (1 - DISCOUNT_100) + int(info[35]) * (1 - DISCOUNT_95_99) + int(info[43]) * (1 - DISCOUNT_85_94) + int(info[51]) + int(info[59]) + int(info[67])),
+                            'Effective Rate Per Word': RAT_PER_WORD * ((int(info[3]) + int(info[11]) + int(info[19]) + int(info[27])) * (1 - DISCOUNT_100) + int(info[35]) * (1 - DISCOUNT_95_99) + int(info[43]) * (1 - DISCOUNT_85_94) + int(info[51]) + int(info[59]) + int(info[67])) / int(info[83]),
+                        }
 
-                    for e in ntpath.dirname(path).replace('\\', ' ').split():
-                        if 'E00' in e:
-                            code = e
-                            break
+                        project = {
+                            'name': name,
+                            'stats': stats,
+                            'date': date,
+                        }
 
-                    # Create all projects' stats - all_stats
-                    if all_stats.get(code):
-                        all_stats[code].append(project)
-                    else:
-                        all_stats[code] = [project, ]
-                        all_stats[f'{code} Total Fee'] = 0
-                        all_stats[f'{code} Total'] = 0
-                        all_stats[f'{code} Effective Rate Per Word'] = 0
+                        for e in ntpath.dirname(path).replace('\\', ' ').split():
+                            if 'E00' in e:
+                                code = e
+                                break
 
-                    # Remove duplicates in all_stats
-                    # https://stackoverflow.com/a/11092590/11461544
-                    all_stats[code] = list(
-                        {v['name']: v for v in all_stats[code]}.values())
-
-                    # Create monthly projects' stats - monthly_stats
-                    year_month = date.strftime('%Y%m')
-                    if monthly_stats.get(year_month):
-                        if monthly_stats[year_month].get(code):
-                            monthly_stats[year_month][code].append(project)
+                        # Create all projects' stats - all_stats
+                        if all_stats.get(code):
+                            all_stats[code].append(project)
                         else:
+                            all_stats[code] = [project, ]
+                            all_stats[f'{code} Total Fee'] = 0
+                            all_stats[f'{code} Total'] = 0
+                            all_stats[f'{code} Effective Rate Per Word'] = 0
+
+                        # Remove duplicates in all_stats
+                        # https://stackoverflow.com/a/11092590/11461544
+                        all_stats[code] = list(
+                            {v['name']: v for v in all_stats[code]}.values())
+
+                        # Create monthly projects' stats - monthly_stats
+                        year_month = date.strftime('%Y%m')
+                        if monthly_stats.get(year_month):
+                            if monthly_stats[year_month].get(code):
+                                monthly_stats[year_month][code].append(project)
+                            else:
+                                monthly_stats[year_month][code] = [project, ]
+                                monthly_stats[year_month][f'{code} Total Fee'] = 0
+                                monthly_stats[year_month][f'{code} Total'] = 0
+                                monthly_stats[year_month][f'{code} Effective Rate Per Word'] = 0
+
+                        else:
+                            monthly_stats[year_month] = {}
                             monthly_stats[year_month][code] = [project, ]
                             monthly_stats[year_month][f'{code} Total Fee'] = 0
                             monthly_stats[year_month][f'{code} Total'] = 0
                             monthly_stats[year_month][f'{code} Effective Rate Per Word'] = 0
 
-                    else:
-                        monthly_stats[year_month] = {}
-                        monthly_stats[year_month][code] = [project, ]
-                        monthly_stats[year_month][f'{code} Total Fee'] = 0
-                        monthly_stats[year_month][f'{code} Total'] = 0
-                        monthly_stats[year_month][f'{code} Effective Rate Per Word'] = 0
+                        # Remove duplicates in monthly_stats
+                        # https://stackoverflow.com/a/11092590/11461544
+                        monthly_stats[year_month][code] = list(
+                            {v['name']: v for v in all_stats[code]}.values())
 
-                    # Remove duplicates in monthly_stats
-                    # https://stackoverflow.com/a/11092590/11461544
-                    monthly_stats[year_month][code] = list(
-                        {v['name']: v for v in all_stats[code]}.values())
+    except FileNotFoundError as e:
+        logging.critical('ERROR: You need to download csv files first and save them to `data/` direcotry.')
+
 
     # Calculate extra metrics in all_stats
     # Such as `Total Fee`, `Total`, `Effective Rate Per Word` for each project code (E00XXX) and all projects
