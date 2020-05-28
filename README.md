@@ -14,4 +14,4 @@ In the terminal, run:
 ./run.sh
 ```
 
-The reports are in the directory `report`.
+The reports are in the directory `report/`.
